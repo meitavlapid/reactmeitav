@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "lRiP5@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "97e5",
+      "firstname": "bbbbb",
+      "lastname": "fffff",
+      "email": "nbkjgnf@gmail.com",
+      "password": "123456654"
+    },
+    {
+      "id": "b796",
+      "firstname": "מיטב",
+      "lastname": "לפיד",
+      "email": "meitavlapid@gmail.com",
+      "password": "123456789"
+    }
+  ],
+  "cards": [
+    {
+      "id": 1,
+      "name": "Card 1",
+      "rank": "A"
+    },
+    {
+      "id": 2,
+      "name": "Card 2",
+      "rank": "2"
+    }
+  ]
+}
