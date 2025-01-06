@@ -1,26 +1,30 @@
 import axios from "axios";
 import { data } from "react-router-dom";
-
-//post login
-export function loginuser(email, password) {
-  return axios
-    .post(
+export async function loginuser(email, password) {
+  try {
+    const response = await axios.post(
       "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/login",
       { email, password },
-      { headers: { "Content-Type": "application/json" } }
-    )
-    .then((response) => {
-      console.log("API Response:", response); // Debugging: Log the full response
-      if (response && response.data) {
-        return { token: response.data }; // Wrap the token in an object for consistency
-      } else {
-        throw new Error("Invalid API response: Missing token");
+      {
+        headers: { "Content-Type": "application/json" },
       }
-    })
-    .catch((error) => {
-      console.error("Error in loginuser:", error);
-      throw error; // Propagate the error to the caller
-    });
+    );
+
+    console.log("API Response:", response);
+
+    if (response && response.data) {
+      localStorage.setItem("x-auth-token", response.data);
+      return { token: response.data };
+    } else {
+      throw new Error("Invalid API response: Missing token");
+    }
+  } catch (error) {
+    console.error(
+      "Error during login in loginuser:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 }
 
 export async function registeruser(data) {
@@ -48,8 +52,31 @@ export function getAllUsers() {
   return axios.get(api);
 }
 //get s specific user by id
-export function getUserId(id) {
-  return axios.get(`${api}/${id}`);
+export async function getUserid(id) {
+  try {
+    const response = await axios.get(
+      "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/id",
+      { id }, // שלח את האימייל והסיסמא בתוך אובייקט
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("x-auth-token"),
+        },
+      }
+    );
+    console.log("API Response:", response); // Debugging: Log the full response
+    if (response && response.data) {
+      return { token: response.data }; // מחזיר את הטוקן בתוך אובייקט
+    } else {
+      throw new Error("Invalid API response: Missing token");
+    }
+  } catch (error) {
+    console.error(
+      "Error during login in loginuser:",
+      error.response?.data || error.message
+    );
+    throw error; // Propagate the error to the caller
+  }
 }
 
 //add new user

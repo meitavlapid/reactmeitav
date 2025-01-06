@@ -73,7 +73,6 @@ function LoginPage() {
             onChange={formik.handleChange}
             value={formik.values.password}
             onBlur={formik.handleBlur}
-            autoComplete="current-password"
           />
 
           {formik.touched.password && formik.errors.password && (

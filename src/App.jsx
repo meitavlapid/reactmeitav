@@ -29,7 +29,7 @@ function App() {
           <Navbar user={user} />
           <Routes>
             <Route path="/home" element={<HomePage />} />
-            <Route path="/createcard/:id" element={<CardDetails />} />
+            <Route path="createcard/:id" element={<CardDetails />} />
             <Route
               path="/login"
               element={

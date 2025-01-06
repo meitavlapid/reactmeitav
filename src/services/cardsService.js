@@ -8,10 +8,33 @@ export function getAllCards() {
   );
 }
 //get s specific card by id
-export function getCardId(id) {
-  return axios.get(
-    "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/65422172e443ec28a252c27d"
-  );
+export async function getCardId(id) {
+  try {
+    const token = localStorage.getItem("x-auth-token");
+    if (!token) {
+      alert("You are not logged in. Redirecting to login page...");
+
+      window.location.href = "/login"; // Redirect to login page
+      return;
+    }
+
+    const response = await axios.get(
+      `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "erorr fetching card:",
+      error.response?.data || error.message
+    );
+    throw new Error(error.response?.data?.message || error.message);
+  }
 }
 
 //get all my cards`

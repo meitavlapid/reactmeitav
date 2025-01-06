@@ -5,25 +5,39 @@ import { useEffect, useState } from "react";
 
 function CardDetails() {
   const { id } = useParams();
-  const [card, setCard] = useState({});
+  const [card, setCard] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    try {
-      const fetchCard = async () => {
-        const card = await getCardId(id);
-        setCard(card);
-      };
-      fetchCard();
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+    const fetchCard = async () => {
+      try {
+        const response = await getCardId(id);
+        console.log("Fetched card:", response);
+        setCard(response);
+      } catch (err) {
+        console.log("Error fetching card:", err);
+        setError("Failed to load card. Please try again later.");
+      }
+    };
+
+    fetchCard();
+  }, [id]);
+  if (error) {
+    return <div>{error}</div>;
+  }
+  if (!card) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
       <div className="card-details">
         <h1>{card.title}</h1>
-        <img src={card.image} alt={card.title} />
+        <img
+          src={card.image || "default-image.png"}
+          alt={card.title}
+          onError={(e) => (e.target.src = "default-image.png")}
+        />
         <p>{card.description}</p>
         <p>Phone: {card.phone}</p>
         <p>Address: {card.address}</p>

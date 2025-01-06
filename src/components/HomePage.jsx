@@ -155,7 +155,7 @@ function HomePage() {
           </button>
         </div>
       )}
-      {loading && <p>Loading more cards...</p>}
+      {loading && <p>Loading cards...</p>}
     </div>
   );
 }
