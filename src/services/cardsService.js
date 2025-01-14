@@ -10,10 +10,9 @@ export function getAllCards() {
 //get s specific card by id
 export async function getCardId(id) {
   try {
-    const token = localStorage.getItem("x-auth-token");
+    const token = localStorage.getItem("token");
     if (!token) {
-      alert("You are not logged in. Redirecting to login page...");
-
+      console.log("You are not logged in. Redirecting to login page...");
       window.location.href = "/login"; // Redirect to login page
       return;
     }
@@ -101,7 +100,7 @@ export function likeCard(cardId, userId) {
       { liked: { cardId: cardId } },
       {
         headers: {
-          "x-auth-token": "your-auth-token",
+          "x-auth-token": localStorage.getItem("token"),
         },
       }
     )

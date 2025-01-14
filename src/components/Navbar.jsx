@@ -1,11 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+
+import { useTheme } from "./themeContext";
 
 function Navbar() {
+  const { theme, toggleTheme } = useTheme();
   return (
     <>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
-        <div className="container-fluid">
+      <nav className="navbar navbar-expand ">
+        <div className="container-fluid m-3">
           <a className="navbar-brand" href="home#">
             MLapid
           </a>
@@ -21,13 +23,9 @@ function Navbar() {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul className="navbar-nav ">
               <li className="nav-item">
-                <a
-                  className="nav-link active"
-                  aria-current="page"
-                  href="about#"
-                >
+                <a aria-current="page" href="about#">
                   about
                 </a>
               </li>
@@ -42,6 +40,7 @@ function Navbar() {
                   Search
                 </button>
               </form>
+
               <li className="nav-item">
                 <a className="nav-link" href="register#">
                   Register
@@ -49,9 +48,16 @@ function Navbar() {
               </li>
               <li className="nav-item">
                 <a className="nav-link" href="login#">
-                  LOGIN
+                  Login
                 </a>
               </li>
+              <i
+                class="fa-solid "
+                onClick={toggleTheme}
+                style={{ cursor: "pointer" }}
+              >
+                {theme === "light" ? "Dark" : "Light"}
+              </i>
             </ul>
           </div>
         </div>

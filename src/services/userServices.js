@@ -13,7 +13,7 @@ export async function loginuser(email, password) {
     console.log("API Response:", response);
 
     if (response && response.data) {
-      localStorage.setItem("x-auth-token", response.data);
+      localStorage.setItem("token", response.data);
       return { token: response.data };
     } else {
       throw new Error("Invalid API response: Missing token");

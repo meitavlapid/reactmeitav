@@ -83,7 +83,7 @@ function HomePage() {
   };
 
   return (
-    <div className="home-container">
+    <div className="home-container ">
       <header className="text-center py-4">
         <h1>Welcome</h1>
         <h2>Discover the Best Recommended Businesses!</h2>
@@ -93,50 +93,75 @@ function HomePage() {
       ) : error ? (
         <p className="text-danger">{error}</p>
       ) : (
-        <section className="cards-section d-flex justify-content-space-between ">
+        <section className="cards-section">
           {cards.map((card) => (
-            <div key={card.id} className="card mx-3 my-3">
+            <div key={card._id} className="card ">
               <img src={card.image.url} alt={card.title} />
               <h3>{card.title}</h3>
               <h4>{card.subtitle}</h4>
               <p>{card.description}</p>
-              <div className="details mt-3">
-                <p>Phone: {card.phone}</p>
-                <p>
-                  Address: {card.address.city}, {card.address.state},{" "}
-                  {card.address.country},{card.address.houseNumber},{" "}
-                  {card.address.street}
-                </p>
-                <p>Card number: {card.bizNumber}</p>
+              <div className="details ">
+                <h4
+                  style={{
+                    color: "#007BFF",
+                    fontWeight: "bold",
+                    fontSize: "15px",
+                    margin: "auto",
+                  }}
+                >
+                  Phone:<p> {card.phone}</p>
+                </h4>
+                <h4
+                  style={{
+                    color: "#007BFF",
+                    fontWeight: "bold",
+                    fontSize: "15px",
+                    margin: "auto",
+                  }}
+                >
+                  Address:
+                  <p>
+                    {card.address.city}, {card.address.state},
+                    {card.address.country},{card.address.houseNumber},
+                    {card.address.street}
+                  </p>
+                </h4>
+                <h4
+                  style={{
+                    color: "#007BFF",
+                    fontWeight: "bold",
+                    fontSize: "15px",
+                    margin: "auto",
+                  }}
+                >
+                  Card number: <p> {card.bizNumber}</p>
+                </h4>
               </div>
-              <div
-                className="card-actions justify-content-space-between
-               bg-light py-2  rounded-bottom 
-               
-               "
-              >
+              <div className="actions">
                 <button
                   className="phone-icon"
                   onClick={() => handleCall(card.phone)}
-                  style={{ cursor: "pointer" }}
                 >
-                  <FaPhone size={15} color="#007BFF" />{" "}
-                  {/* שינוי צבע האייקון */}
+                  <FaPhone
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0)",
+                    }}
+                  />
                 </button>
                 <button
                   className="like-button"
-                  onClick={() => handleLike(card.id)}
+                  onClick={() => handleLike(card._id)}
                 >
                   <i
                     className={`fa fa-heart ${
-                      likedCards[card.id] ? "liked" : ""
+                      likedCards[card._id] ? "" : "liked"
                     }`}
-                    style={{ color: likedCards[card.id] ? "red" : "gray" }} // צבע אדום אם יש לייק
+                    style={{ color: likedCards[card._id] ? "gray" : "red" }} // צבע אדום אם יש לייק
                   ></i>
                 </button>
                 <button
-                  className="btn btn-primary"
-                  onClick={() => navigate(`/createcard/${card.id}`)}
+                  className="view-button"
+                  onClick={() => navigate(`/createcard/${card._id}`)}
                   style={{ cursor: "pointer" }}
                   title="View Business"
                 >
