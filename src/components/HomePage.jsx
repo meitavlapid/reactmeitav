@@ -91,7 +91,7 @@ function HomePage() {
     }
   };
   return (
-    <div className="home-container">
+    <div className="home-container ">
       <header className="text-center py-4">
         <h1>Welcome</h1>
         <h2>Discover the Best Recommended Businesses!</h2>

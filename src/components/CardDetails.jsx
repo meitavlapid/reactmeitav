@@ -2,7 +2,8 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { getCardId } from "../services/cardsService";
 import { useEffect, useState } from "react";
-
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import MyMap from "./CustomMap";
 function CardDetails() {
   const { id } = useParams();
   const [card, setCard] = useState(null);

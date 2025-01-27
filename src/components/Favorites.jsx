@@ -81,7 +81,7 @@ function LikedCardsPage() {
                   <div className="favcard-actions">
                     <button
                       className="btn btn-primary"
-                      onClick={() => navigate(`/details/${card._id}`)}
+                      onClick={() => navigate(`/createcard/${card._id}`)}
                     >
                       View
                     </button>

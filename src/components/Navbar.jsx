@@ -36,7 +36,7 @@ function Navbar() {
           <ul className="navbar-nav">
             <li className="nav-item">
               <a aria-current="page" href="about#">
-                ABOUT
+                About
               </a>
             </li>
             {user && isAdmin && isBusiness && (
@@ -131,12 +131,12 @@ function Navbar() {
             <>
               <li className="nav-item">
                 <a className="nav-link" href="register#">
-                  REGISTER
+                  Register
                 </a>
               </li>
               <li className="nav-item">
                 <a className="nav-link" href="login#">
-                  LOGIN
+                  Login
                 </a>
               </li>
             </>
