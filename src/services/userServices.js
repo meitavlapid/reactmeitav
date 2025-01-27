@@ -1,5 +1,5 @@
 import axios from "axios";
-import { data } from "react-router-dom";
+
 export async function loginuser(email, password) {
   try {
     const response = await axios.post(
@@ -13,8 +13,11 @@ export async function loginuser(email, password) {
     console.log("API Response:", response);
 
     if (response && response.data) {
-      localStorage.setItem("x-auth-token", response.data);
-      return { token: response.data };
+      const token = response.data; // חילוץ הטוקן מהתגובה
+      console.log("Token:", token);
+
+      localStorage.setItem("token", token);
+      return { token };
     } else {
       throw new Error("Invalid API response: Missing token");
     }
@@ -52,24 +55,23 @@ export function getAllUsers() {
   return axios.get(api);
 }
 //get s specific user by id
-export async function getUserid(id) {
+export async function getUserById(id) {
   try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found.");
+    }
     const response = await axios.get(
-      "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/id",
-      { id }, // שלח את האימייל והסיסמא בתוך אובייקט
+      `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`,
+      // שלח את האימייל והסיסמא בתוך אובייקט
       {
         headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("x-auth-token"),
+          "x-auth-token": token,
         },
       }
     );
     console.log("API Response:", response); // Debugging: Log the full response
-    if (response && response.data) {
-      return { token: response.data }; // מחזיר את הטוקן בתוך אובייקט
-    } else {
-      throw new Error("Invalid API response: Missing token");
-    }
+    return await response.data; // מחזיר את הטוקן בתוך אובייקט
   } catch (error) {
     console.error(
       "Error during login in loginuser:",
@@ -79,28 +81,34 @@ export async function getUserid(id) {
   }
 }
 
-//add new user
-export function addUser(newCustomer) {
-  return axios.post(api, newCustomer);
-}
-
 //update a specific user
-export function updateUser(cusid, updatedCustomer) {
-  return axios.put(`${api}/${cusid}`, updatedCustomer);
-}
+export async function updateUser(id, userData) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    throw new Error("Authentication token is missing");
+  }
 
-//delete a specific user
+  const config = {
+    method: "put",
+    maxBodyLength: Infinity,
+    url: `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/users/${id}`,
+    headers: {
+      "x-auth-token": token,
+      "Content-Type": "application/json",
+    },
+    data: userData,
+  };
+  try {
+    const response = await axios.request(config);
+    console.log("Card updated successfully:", response.data);
 
-export function deleteUser(cusid) {
-  return axios.delete(`${api}/${cusid}`);
-}
-
-// check if user exists
-export function checkUserExists(Cusemail) {
-  return axios.get(`${api}?email=${Cusemail}`);
-}
-
-// check if user password exists
-export function checkUserPasswordExists(Cusemail) {
-  return axios.get(`${api}?password=${Cusemail}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating user:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 }

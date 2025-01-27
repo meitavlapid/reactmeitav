@@ -1,50 +1,137 @@
 import React from "react";
+import { useTheme } from "./themeContext";
+import { useSearch } from "../hooks/SearchContext";
+import { useUser } from "../hooks/UserContext";
+import "../css/navbar.css";
+import { string } from "yup";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+  const { searchTerm, setSearchTerm } = useSearch();
+  const { user, isAdmin, isBusiness, isUser } = useUser();
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value); // מעדכן את searchTerm ב-Context
+  };
+
   return (
-    <>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="home#">
-            MLapid
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+    <nav className="navbar navbar-expand">
+      <div className="container-fluid ">
+        <a className="navbar-brand fw-bold fs-4 " href="/home">
+          MLapid
+        </a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <a aria-current="page" href="about#">
+                ABOUT
+              </a>
+            </li>
+            {user && isAdmin && isBusiness && (
+              <>
+                <li className="nav-item">
+                  <a className="nav-link" href="/favorites">
+                    Favorites
+                  </a>
+                </li>
+              </>
+            )}
+            {isAdmin && isBusiness && (
+              <>
+                <li className="nav-item">
+                  <a className="nav-link" href="/mycards">
+                    My Cards
+                  </a>
+                </li>
+              </>
+            )}
+
+            {user && isAdmin && isBusiness && (
               <li className="nav-item">
-                <a
-                  className="nav-link active"
-                  aria-current="page"
-                  href="about#"
-                >
-                  about
-                </a>
+                <Link className="nav-link" to="/profile">
+                  Profile
+                </Link>
               </li>
-              <form className="d-flex" role="search">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
-                <button className="btn btn-outline-success" type="submit">
-                  Search
-                </button>
-              </form>
+            )}
+          </ul>
+          <div className="navbarwelcome d-flex align-items-center">
+            {user ? (
+              <h3>Welcome {user?.name?.first || "Guest"}!</h3>
+            ) : (
+              <h3 className=" fw-bold fs-4 text-primary me-5 ms-5 mb-0 p-2 text-center">
+                Welcome Guest!
+              </h3>
+            )}
+            {isAdmin ? (
+              <h4>You are an Admin</h4>
+            ) : isBusiness ? (
+              <h4>You are a Business User</h4>
+            ) : isUser ? (
+              <h4>You are aregistered User</h4>
+            ) : (
+              <></>
+            )}
+            <div className="navicon">
+              {[
+                {
+                  condition: isAdmin,
+                  icon: "fa-user-secret fa-solid  text-primary",
+
+                  className: "navicon1",
+                },
+
+                {
+                  condition: isBusiness && !isAdmin,
+                  icon: "fa-user-tie text-info",
+                  className: "navicon",
+                  color: "red",
+                  style: { color: "red" },
+                },
+                {
+                  condition: isUser && !isAdmin && !isBusiness,
+                  icon: "fa-user text-success",
+                  className: "navicon",
+                },
+              ]
+                .filter((item) => item.condition)
+                .map((item, index) => (
+                  <div
+                    className="navbar-nav d-flex align-items-center"
+                    key={index}
+                  >
+                    <i className={`fa-solid ${item.icon} me-2`}></i>
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+          <ul className="navbar-nav ms-auto">
+            <form className="d-flex" role="search">
+              <input
+                className="form-control me-2"
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={handleSearchChange} // מפעיל עדכון חיפוש
+              />
+            </form>
+
+            <>
               <li className="nav-item">
                 <a className="nav-link" href="register#">
-                  Register
+                  REGISTER
                 </a>
               </li>
               <li className="nav-item">
@@ -52,11 +139,19 @@ function Navbar() {
                   LOGIN
                 </a>
               </li>
-            </ul>
-          </div>
+            </>
+
+            <i
+              className="fa-solid"
+              onClick={toggleTheme}
+              style={{ cursor: "pointer" }}
+            >
+              {theme === "light" ? "Dark" : "Light"}
+            </i>
+          </ul>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }
 

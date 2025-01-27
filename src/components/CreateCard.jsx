@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { addCard } from "../services/cardsService";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CreateCard() {
   const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -30,30 +33,51 @@ function CreateCard() {
       likes: [],
       user_id: "",
       createdAt: "",
+      isBusiness: true,
     },
     validationSchema: yup.object({
-      title: yup.string().required("Title is required"),
-      subtitle: yup.string().required("Subtitle is required"),
-      description: yup.string().required("Description is required"),
+      title: yup.string().min(2).max(256).required("Title is required"),
+      subtitle: yup.string().min(2).max(256).required("Subtitle is required"),
+      description: yup
+        .string()
+        .min(2)
+        .max(1024)
+        .required("Description is required"),
       phone: yup
         .string()
-        .matches(/^\d{10}$/, "Phone number must be 10 digits")
+        .min(9)
+        .max(11)
+        .matches(/^[0-9]+$/, "Phone number must contain only digits")
+        .test("phone", "Phone number must start with 0", (value) =>
+          value.startsWith("0")
+        )
         .required("Phone number is required"),
-      email: yup.string().email().required("Email is required"),
-      web: yup.string().url().required("Web URL is required"),
+      email: yup
+        .string()
+        .email("Invalid email format")
+        .required("Email is required"),
+      web: yup.string().url("Invalid URL").required("Web URL is required"),
       image: yup.object({
-        url: yup.string().url().required("Image URL is required"),
-        alt: yup.string().required("Image alt text is required"),
+        url: yup
+          .string()
+          .url("Invalid Image URL")
+          .required("Image URL is required"),
+        alt: yup.string().max(256, "Alt text must be less than 256 characters"),
       }),
       address: yup.object({
-        state: yup.string(),
-        country: yup.string().required("Country is required"),
-        city: yup.string().required("City is required"),
-        street: yup.string().required("Street is required"),
-        houseNumber: yup.number().required("House number is required"),
-        zip: yup.string().required("Zip code is required"),
+        state: yup.string().optional(),
+        country: yup.string().min(2).required("Country is required"),
+        city: yup.string().min(2).required("City is required"),
+        street: yup.string().min(2).required("Street is required"),
+        houseNumber: yup
+          .number()
+          .positive("House number must be positive")
+          .required("House number is required"),
+        zip: yup
+          .number()
+          .positive("Zip must be positive")
+          .required("Zip code is required"),
       }),
-      bizNumber: yup.string().required("Business number is required"),
     }),
     onSubmit: async (values) => {
       try {
@@ -65,17 +89,23 @@ function CreateCard() {
           email: values.email,
           web: values.web,
           image: {
-            url: values.image.url,
-            alt: values.image.alt,
+            alt: values.image?.alt,
+            url: values.image?.url,
           },
-          address: values.address,
-          bizNumber: values.bizNumber,
+          address: {
+            state: values.address?.state,
+            country: values.address?.country,
+            city: values.address?.city,
+            street: values.address?.street,
+            houseNumber: values.address?.houseNumber,
+            zip: values.address?.zip,
+          },
         };
 
         console.log("Data being sent to server:", cardData);
-
-        await addCard(cardData);
-        navigate("/");
+        const response = await addCard(cardData);
+        toast.success("Card created successfully!");
+        navigate("/mycards");
       } catch (error) {
         console.error("Error creating card:", error.message || error);
         alert(
@@ -129,7 +159,7 @@ function CreateCard() {
             <input
               type="text"
               id="description"
-              name="description" // Fixed here
+              name="description"
               className="form-control form-control-lg"
               placeholder="description"
               {...formik.getFieldProps("description")}
@@ -148,7 +178,7 @@ function CreateCard() {
               Phone
             </label>
             <input
-              type="text"
+              type="tel"
               id="phone"
               name="phone"
               className="form-control form-control-lg"
@@ -293,7 +323,7 @@ function CreateCard() {
           <div className="col">
             <label htmlFor="address.houseNumber">House Number</label>
             <input
-              type="text"
+              type="number"
               id="address.houseNumber"
               name="address.houseNumber"
               className="form-control form-control-lg"
@@ -310,7 +340,7 @@ function CreateCard() {
           <div className="col">
             <label htmlFor="zip">Zip</label>
             <input
-              type="text"
+              type="number"
               id="address.zip"
               name="address.zip"
               className="form-control form-control-lg"
@@ -324,19 +354,6 @@ function CreateCard() {
             )}
           </div>
         </div>
-
-        <label htmlFor="bizNumber">Business Number</label>
-        <input
-          type="text"
-          id="bizNumber"
-          name="bizNumber"
-          className="form-control form-control-lg"
-          placeholder="Enter business number"
-          {...formik.getFieldProps("bizNumber")}
-        />
-        {formik.touched.bizNumber && formik.errors.bizNumber && (
-          <div className="error text-danger">{formik.errors.bizNumber}</div>
-        )}
 
         <button
           className="btn btn-primary mt-4 btn-block w-100"

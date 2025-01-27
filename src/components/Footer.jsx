@@ -1,41 +1,48 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import "../css/footer.css";
+import { useUser } from "../hooks/UserContext";
 
 function Footer() {
+  const { user, isAdmin, isBisser, isUser } = useUser();
   return (
-    <>
-      <footer className="footer">
-        <p>כל הזכויות שמורות &copy; 2023</p>
+    <footer className="footer">
+      <div className="footer-icon">
+        {/* אייקון סימן קריאה */}
+        <Link to="/about" className="footer-link">
+          <i
+            className="fa-solid fa-circle-exclamation fa-2xl"
+            style={{ color: "#f39c12" }}
+          ></i>
+          <p className="footer-text">About</p>
+        </Link>
 
-        <div className="social-icons">
-          <a
-            href="https://www.facebook.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-facebook"></i>
-          </a>
-          <a
-            href="https://www.twitter.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-twitter"></i>
-          </a>
-          <a
-            href="https://www.instagram.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <i className="fab fa-instagram"></i>
-          </a>
-        </div>
+        {/* אייקון לב */}
+        {isUser && isAdmin && isBisser && (
+          <Link to="/favorites" className="footer-link">
+            <i
+              className="fa-solid fa-heart fa-2xl"
+              style={{ color: "red" }}
+            ></i>
+            <p className="footer-text">Favorites</p>
+          </Link>
+        )}
 
-        <p>
-          <a href="#">צור קשר</a> | <a href="#">פרטי האתר</a> |{" "}
-          <a href="#">מדיניות האתר</a>
-        </p>
-      </footer>
-    </>
+        {/* אייקון כרטיס */}
+        {isBisser && isAdmin && (
+          <Link to="/mycards" className="footer-link">
+            <i
+              className="fa-regular fa-address-card fa-2xl"
+              style={{ color: "green" }}
+            ></i>
+            <p className="footer-text">My Cards</p>
+          </Link>
+        )}
+      </div>
+
+      {/* טקסט זכויות יוצרים */}
+      <p className="footer-copyright">כל הזכויות שמורות &copy; 2023</p>
+    </footer>
   );
 }
 

@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { registeruser } from "../services/userServices";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -101,13 +102,13 @@ function RegisterPage() {
         // טיפול בתגובה מהשרת
         if (response.status === 200 || response.status === 201) {
           localStorage.setItem("newuser", JSON.stringify(response.data));
-          alert("Registration successful");
+          toast.success("Registration successful!");
           navigate("/home");
         } else {
           const errorMessage =
             response?.data?.message || "Registration failed. Please try again.";
           console.error("Registration failed:", response);
-          alert(errorMessage);
+          toast.error(errorMessage);
         }
       } catch (error) {
         console.error("Error during registration:", error);
@@ -115,7 +116,7 @@ function RegisterPage() {
           error?.response?.data?.message ||
           error.message ||
           "A server error occurred.";
-        alert(errorMessage);
+        toast.error(errorMessage);
       }
     },
   });

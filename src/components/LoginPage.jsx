@@ -3,6 +3,7 @@ import * as yup from "yup";
 import React from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { loginuser } from "../services/userServices";
+import { toast } from "react-toastify";
 
 function LoginPage() {
   // "email": "ellvis@email.com",
@@ -21,16 +22,21 @@ function LoginPage() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const { email, password } = values;
-        const { token } = await loginuser(email, password);
+        const token = await loginuser(email, password);
 
         if (token) {
-          localStorage.setItem("authToken", token); // Save token in localStorage
+          console.log("Login successful:", token);
+          toast.success("Logged in successfully!", { toastId: "unique-id" });
+
+          localStorage.setItem("token", token.token); // Save token in localStorage
           navigate("/home"); // Navigate to home page
         } else {
           alert("Login failed: Token not found.");
         }
       } catch (error) {
         console.error("Login error:", error.message || error);
+        toast.error("Login failed. Please check your credentials.");
+
         alert(
           error.response?.data?.message ||
             "Login failed: An error occurred. Please check your credentials and try again."

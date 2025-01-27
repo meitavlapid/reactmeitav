@@ -1,87 +1,95 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllCards, likeCard } from "../services/cardsService";
-import { FaPhone, FaHeart } from "react-icons/fa";
+import { FaPhone } from "react-icons/fa";
+import { useTheme } from "./themeContext";
+import { useSearch } from "../hooks/SearchContext";
+import { getUserById } from "../services/userServices";
+import { toast } from "react-toastify";
+import { useUser } from "../hooks/UserContext";
 
 function HomePage() {
-  const [allCards, setAllCards] = useState([]); // כל הכרטיסים
-  const [cards, setCards] = useState([]); // הכרטיסים שמוצגים כרגע
-  const [loading, setLoading] = useState(false); // מצב טעינה
-  const [error, setError] = useState(null); // מצב שגיאה
+  const [allCards, setAllCards] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [likedCards, setLikedCards] = useState({});
-
+  const { searchTerm } = useSearch(); // ערך החיפוש מה-Context
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const handleCall = (phoneNumber) => {
-    window.location.href = `tel:${phoneNumber}`; // יכנס לחלון החיוג עם המספר
+    window.location.href = `tel:${phoneNumber}`;
   };
 
+  // Fetch all cards
   useEffect(() => {
     const fetchCards = async () => {
-      setLoading(true); // מצב טעינה
+      setLoading(true);
       try {
-        const response = await getAllCards(); // מביא את כל הכרטיסים
-        setAllCards(response.data); // שומר את כל הכרטיסים
-        setCards(response.data.slice(0, 6)); // מציג את ה-6 הראשונים
-        setLoading(false); // עדכון מצב טעינה
-        setLikedCards(
-          response.data.reduce((acc, card) => {
-            acc[card._id] = card.likes;
-            return acc;
-          }, {})
-        );
+        const response = await getAllCards();
+        const fetchedCards = response.data || [];
+        setAllCards(fetchedCards);
+        setCards(fetchedCards.slice(0, 6));
+        const likesState = fetchedCards.reduce((acc, card) => {
+          acc[card._id] = card.likes.includes(user._id); // בדיקה אם המשתמש אהב את הכרטיס
+          return acc;
+        }, {});
+        setLikedCards(likesState);
+        // toast.success("Cards loaded successfully!");
       } catch (err) {
         setError("Failed to load cards. Please try again later.");
+        // toast.error("Error loading cards.");
+      } finally {
         setLoading(false);
       }
     };
-    fetchCards();
+    fetchCards()
+      .then(() => {
+        toast("This is a toast", { toastId: "uniqueId" });
+      })
+      .catch((error) => {
+        console.error("Error loading cards:", error);
+        toast.error("Error loading cards.");
+      });
   }, []);
 
-  // פונקציה שמטפלת בגלילה למטה
+  // Filter cards based on searchTerm
+  useEffect(() => {
+    const filteredCards = allCards.filter((card) =>
+      card.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setCards(filteredCards.slice(0, 6));
+  }, [searchTerm, allCards]);
+
+  // Load more cards
   const loadMoreCards = () => {
-    setLoading(true); // מצב טעינה
-    const nextCards = allCards.slice(cards.length, cards.length + 6);
+    const nextCards = allCards
+      .filter((card) =>
+        card.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .slice(cards.length, cards.length + 6);
     setCards((prevCards) => [...prevCards, ...nextCards]);
-    setLoading(false); // עדכון מצב טעינה
-  };
-  const handleLike = (cardId) => {
-    const currentLikedStatus = likedCards[cardId] || false; // אם אין לייק, נחשב כרשום כ-`false`
-    const newLikedStatus = !currentLikedStatus; // הופכים את הסטטוס של הלייק
-
-    console.log("Before Update:", likedCards); // Debugging: לפני עדכון
-
-    setLikedCards((prevLikedCards) => {
-      // עדכון רק את הכרטיס הנבחר עם הסטטוס החדש
-      const updatedLikedCards = { ...prevLikedCards, [cardId]: newLikedStatus };
-      console.log("Updated liked cards:", updatedLikedCards); // Debugging: אחרי עדכון
-      return updatedLikedCards;
-    });
-
-    // קריאה לפונקציה לעדכון הסטטוס ב-API
-    likeCard(cardId, newLikedStatus)
-      .then(() => {
-        console.log(`Card ${cardId} liked status updated to ${newLikedStatus}`);
-      })
-      .catch((err) => {
-        console.error("Error updating like status:", err);
-      });
   };
 
-  const handleView = (id) => {
-    navigate(`/business/${id}`);
-  };
+  // Handle like/unlike
+  const handleLike = async (id) => {
+    try {
+      const currentLikedStatus = likedCards[id] || false;
+      const isLiked = !currentLikedStatus;
 
-  const handleEdit = (id) => {
-    alert(`עריכת כרטיס עסק ${id}`);
-  };
+      await likeCard(id, isLiked);
+      toast.success(isLiked ? "Liked successfully!" : "Unliked successfully!");
 
-  const handleDelete = (id) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק את הכרטיס?")) {
-      alert(`כרטיס עסק ${id} נמחק.`);
+      setLikedCards((prevLikedCards) => ({
+        ...prevLikedCards,
+        [id]: isLiked,
+      }));
+    } catch (error) {
+      console.error("Error updating like status:", error);
+      toast.error("Failed to update like status.");
     }
   };
-
   return (
     <div className="home-container">
       <header className="text-center py-4">
@@ -93,52 +101,44 @@ function HomePage() {
       ) : error ? (
         <p className="text-danger">{error}</p>
       ) : (
-        <section className="cards-section d-flex justify-content-space-between ">
+        <section className="cards-section">
           {cards.map((card) => (
-            <div key={card.id} className="card mx-3 my-3">
+            <div key={card._id} className="card">
               <img src={card.image.url} alt={card.title} />
               <h3>{card.title}</h3>
               <h4>{card.subtitle}</h4>
               <p>{card.description}</p>
-              <div className="details mt-3">
-                <p>Phone: {card.phone}</p>
-                <p>
-                  Address: {card.address.city}, {card.address.state},{" "}
-                  {card.address.country},{card.address.houseNumber},{" "}
-                  {card.address.street}
-                </p>
-                <p>Card number: {card.bizNumber}</p>
+              <div className="details">
+                <h4>Phone: {card.phone}</h4>
+                <h4>
+                  Address: {`${card.address.street}, ${card.address.city}`}
+                </h4>
+                <h4>Card number: {card.bizNumber}</h4>
               </div>
-              <div
-                className="card-actions justify-content-space-between
-               bg-light py-2  rounded-bottom 
-               
-               "
-              >
+              <div className="actions">
                 <button
                   className="phone-icon"
                   onClick={() => handleCall(card.phone)}
-                  style={{ cursor: "pointer" }}
                 >
-                  <FaPhone size={15} color="#007BFF" />{" "}
-                  {/* שינוי צבע האייקון */}
+                  <FaPhone style={{ backgroundColor: "inherit" }} />
                 </button>
                 <button
                   className="like-button"
-                  onClick={() => handleLike(card.id)}
+                  onClick={() => handleLike(card._id)}
+                  disabled={!user}
                 >
                   <i
-                    className={`fa fa-heart ${
-                      likedCards[card.id] ? "liked" : ""
-                    }`}
-                    style={{ color: likedCards[card.id] ? "red" : "gray" }} // צבע אדום אם יש לייק
+                    className="fa-solid fa-heart"
+                    style={{
+                      color: likedCards[card._id] ? "red" : "gray",
+                      fontSize: "0.9rem",
+                      backgroundColor: "transparent",
+                    }}
                   ></i>
                 </button>
                 <button
-                  className="btn btn-primary"
-                  onClick={() => navigate(`/createcard/${card.id}`)}
-                  style={{ cursor: "pointer" }}
-                  title="View Business"
+                  className="view-button"
+                  onClick={() => navigate(`/createcard/${card._id}`)}
                 >
                   View
                 </button>
@@ -155,7 +155,6 @@ function HomePage() {
           </button>
         </div>
       )}
-      {loading && <p>Loading cards...</p>}
     </div>
   );
 }
