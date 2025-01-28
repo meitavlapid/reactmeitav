@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-function Notfound() {
+function NotFound() {
   let nav = useNavigate();
   return (
     <>
@@ -19,4 +19,4 @@ function Notfound() {
   );
 }
 
-export default Notfound;
+export default NotFound;

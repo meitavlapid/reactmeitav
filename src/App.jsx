@@ -19,7 +19,7 @@ import LikedCardsPage from "./components/Favorites";
 import UserProfile from "./components/MyInfo";
 import About from "./components/About";
 import Footer from "./components/Footer";
-import Notfound from "./components/NotFound";
+import NotFound from "./components/NotFound";
 import CardDetails from "./components/CardDetails";
 import EditCardForm from "./components/EditCardForm";
 import CreateCard from "./components/CreateCard";
@@ -65,7 +65,7 @@ const AppContent = ({ user, toggleTheme, handleSearch, allCards }) => {
             user && user.role === "admin" ? <Admin /> : <Navigate to="/home" />
           }
         />
-        <Route path="*" element={<Notfound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!shouldHideNavbar && <Footer />}
     </>
