@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { addCard } from "../services/cardsService";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function CreateCard() {
   const navigate = useNavigate();
@@ -104,7 +103,7 @@ function CreateCard() {
 
         console.log("Data being sent to server:", cardData);
         const response = await addCard(cardData);
-        toast.success("Card created successfully!");
+        toast.success("Card created successfully!", { toastId: "uniqueId" });
         navigate("/mycards");
       } catch (error) {
         console.error("Error creating card:", error.message || error);

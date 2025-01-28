@@ -2,8 +2,6 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { getCardId } from "../services/cardsService";
 import { useEffect, useState } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import MyMap from "./CustomMap";
 function CardDetails() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
@@ -36,7 +34,7 @@ function CardDetails() {
         <div>
           <h1>{card.title}</h1>
           <img
-            className="cardImage mb-4"
+            className="cardImage m-5 w-25 h-25 img-fluid shadow-lg"
             src={card.image.url}
             alt={card.title}
             onError={(e) => (e.target.src = "default-image.png")}

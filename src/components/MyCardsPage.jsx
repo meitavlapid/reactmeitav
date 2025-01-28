@@ -33,7 +33,7 @@ function MyCardsPage() {
         setLoading(false);
         let isrun = false;
         if (!isrun) {
-          toast.success("Cards loaded successfully!");
+          toast.success("Cards loaded successfully!", { toastId: "uniqueId" });
           isrun = true;
         }
       }
@@ -41,24 +41,6 @@ function MyCardsPage() {
 
     fetchCards();
   }, []);
-
-  // const handleDelete = async (bizNumber) => {
-  //   if (window.confirm("Are you sure you want to delete this card?")) {
-  //     try {
-  //       await deleteCard(bizNumber);
-  //       setCards((prevCards) =>
-  //         prevCards.filter((card) => card.bizNumber !== bizNumber)
-  //       );
-  //       toast.success("Card deleted successfully!");
-  //     } catch (err) {
-  //       console.error("Error deleting card:", err);
-  //       toast.error("Failed to delete card. Please try again later.");
-  //     }
-  //   }
-  // };
-
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>{error}</div>;
 
   return (
     <div className="mycontainer">
@@ -131,7 +113,9 @@ function MyCardsPage() {
                     className="mycardbuttondelete"
                     onClick={() => {
                       deleteCard(card._id);
-                      toast.success("Card deleted successfully!");
+                      toast.success("Card deleted successfully!", {
+                        toastId: "uniqueId",
+                      });
 
                       setCards((prevCards) =>
                         prevCards.filter((c) => c._id !== card._id)

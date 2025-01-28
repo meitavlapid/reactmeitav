@@ -38,19 +38,10 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  //     const decodedUser = jwtDecode(localStorage.getItem("user"));
-  //     setUser(decodedUser);
-  //     localStorage.setItem("user", userData); // שמירת הטוקן
-  //   } catch (error) {
-  //     console.error("Invalid user data:", error);
-  //   }
-  // };
-
-  // ניתוק משתמש
-  // const logoutUser = () => {
-  //   setUser(null);
-  //   localStorage.removeItem("user");
-  // };
+  const logoutUser = () => {
+    setUser(null);
+    localStorage.removeItem("token");
+  };
 
   // בדיקת חיבור לאחר רענון
   useEffect(() => {
@@ -62,16 +53,12 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  //   const storedUser = async () => setUser(await getUserFromLocalStorage());
-  //   storedUser();
-  // }, []);
-
   // ערכים בקונטקסט
   const value = {
     user,
-    loginUser,
-    // logoutUser,
-    isLoggedIn: !!user,
+    setUser,
+    // loginUser,
+    logoutUser,
     isAdmin: user?.isAdmin || false,
     isBusiness: user?.isBusiness || false,
     isUser: user?.isUser || false,

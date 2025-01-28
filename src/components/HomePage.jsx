@@ -15,7 +15,7 @@ function HomePage() {
   const [error, setError] = useState(null);
   const [likedCards, setLikedCards] = useState({});
   const { searchTerm } = useSearch(); // ערך החיפוש מה-Context
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
 
   const handleCall = (phoneNumber) => {
@@ -31,28 +31,23 @@ function HomePage() {
         const fetchedCards = response.data || [];
         setAllCards(fetchedCards);
         setCards(fetchedCards.slice(0, 6));
-        const likesState = fetchedCards.reduce((acc, card) => {
-          acc[card._id] = card.likes.includes(user._id); // בדיקה אם המשתמש אהב את הכרטיס
-          return acc;
-        }, {});
-        setLikedCards(likesState);
-        // toast.success("Cards loaded successfully!");
+        if (user && user._id) {
+          const likesState = fetchedCards.reduce((acc, card) => {
+            acc[card._id] = card.likes.includes(user._id);
+            return acc;
+          }, {});
+          setLikedCards(likesState);
+        }
+        toast.success("Cards loaded successfully!", { toastId: "uniqueId" });
       } catch (err) {
         setError("Failed to load cards. Please try again later.");
-        // toast.error("Error loading cards.");
+        toast.error("Error loading cards.", { toastId: "uniqueId" });
       } finally {
         setLoading(false);
       }
     };
-    fetchCards()
-      .then(() => {
-        toast("This is a toast", { toastId: "uniqueId" });
-      })
-      .catch((error) => {
-        console.error("Error loading cards:", error);
-        toast.error("Error loading cards.");
-      });
-  }, []);
+    fetchCards();
+  }, [user]);
 
   // Filter cards based on searchTerm
   useEffect(() => {
@@ -79,7 +74,9 @@ function HomePage() {
       const isLiked = !currentLikedStatus;
 
       await likeCard(id, isLiked);
-      toast.success(isLiked ? "Liked successfully!" : "Unliked successfully!");
+      toast.success(isLiked ? "Liked successfully!" : "Unliked successfully!", {
+        toastId: "uniqueId",
+      });
 
       setLikedCards((prevLikedCards) => ({
         ...prevLikedCards,
@@ -87,7 +84,7 @@ function HomePage() {
       }));
     } catch (error) {
       console.error("Error updating like status:", error);
-      toast.error("Failed to update like status.");
+      toast.error("Failed to update like status.", { toastId: "uniqueId" });
     }
   };
   return (
@@ -122,20 +119,23 @@ function HomePage() {
                 >
                   <FaPhone style={{ backgroundColor: "inherit" }} />
                 </button>
-                <button
-                  className="like-button"
-                  onClick={() => handleLike(card._id)}
-                  disabled={!user}
-                >
-                  <i
-                    className="fa-solid fa-heart"
-                    style={{
-                      color: likedCards[card._id] ? "red" : "gray",
-                      fontSize: "0.9rem",
-                      backgroundColor: "transparent",
-                    }}
-                  ></i>
-                </button>
+                {user && (
+                  <button
+                    className="like-button"
+                    onClick={() => handleLike(card._id)}
+                    disabled={!user}
+                  >
+                    <i
+                      className="fa-solid fa-heart"
+                      style={{
+                        color: likedCards[card._id] ? "red" : "gray",
+                        fontSize: "0.9rem",
+                        backgroundColor: "transparent",
+                      }}
+                    ></i>
+                  </button>
+                )}
+
                 <button
                   className="view-button"
                   onClick={() => navigate(`/createcard/${card._id}`)}

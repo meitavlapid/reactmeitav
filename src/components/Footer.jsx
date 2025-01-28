@@ -4,7 +4,7 @@ import "../css/footer.css";
 import { useUser } from "../hooks/UserContext";
 
 function Footer() {
-  const { user, isAdmin, isBisser, isUser } = useUser();
+  const { isAdmin, isBusiness, isUser } = useUser();
   return (
     <footer className="footer">
       <div className="footer-icon">
@@ -18,18 +18,19 @@ function Footer() {
         </Link>
 
         {/* אייקון לב */}
-        {isUser && isAdmin && isBisser && (
-          <Link to="/favorites" className="footer-link">
-            <i
-              className="fa-solid fa-heart fa-2xl"
-              style={{ color: "red" }}
-            ></i>
-            <p className="footer-text">Favorites</p>
-          </Link>
-        )}
+        {isUser ||
+          (isAdmin && isBusiness && (
+            <Link to="/favorites" className="footer-link">
+              <i
+                className="fa-solid fa-heart fa-2xl"
+                style={{ color: "red" }}
+              ></i>
+              <p className="footer-text">Favorites</p>
+            </Link>
+          ))}
 
         {/* אייקון כרטיס */}
-        {isBisser && isAdmin && (
+        {isBusiness && isAdmin && (
           <Link to="/mycards" className="footer-link">
             <i
               className="fa-regular fa-address-card fa-2xl"

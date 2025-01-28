@@ -4,13 +4,18 @@ import { useSearch } from "../hooks/SearchContext";
 import { useUser } from "../hooks/UserContext";
 import "../css/navbar.css";
 import { string } from "yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { searchTerm, setSearchTerm } = useSearch();
-  const { user, isAdmin, isBusiness, isUser } = useUser();
+  const { user, isAdmin, isBusiness, isUser, logoutUser } = useUser();
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logoutUser();
+    navigate("/login");
+  };
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value); // מעדכן את searchTerm ב-Context
   };
@@ -39,14 +44,14 @@ function Navbar() {
                 About
               </a>
             </li>
-            {user && isAdmin && isBusiness && (
-              <>
-                <li className="nav-item">
-                  <a className="nav-link" href="/favorites">
-                    Favorites
-                  </a>
-                </li>
-              </>
+            {isAdmin || isBusiness || isUser || (user && !isAdmin) ? (
+              <li className="nav-item">
+                <a className="nav-link" href="/favorites">
+                  Favorites
+                </a>
+              </li>
+            ) : (
+              <></>
             )}
             {isAdmin && isBusiness && (
               <>
@@ -66,11 +71,11 @@ function Navbar() {
               </li>
             )}
           </ul>
-          <div className="navbarwelcome d-flex align-items-center">
+          <div className="navbarwelcome me-5 ms-5">
             {user ? (
               <h3>Welcome {user?.name?.first || "Guest"}!</h3>
             ) : (
-              <h3 className=" fw-bold fs-4 text-primary me-5 ms-5 mb-0 p-2 text-center">
+              <h3 className=" fw-bold  me-5 ms-5 mb-0 p-2 text-center">
                 Welcome Guest!
               </h3>
             )}
@@ -127,19 +132,26 @@ function Navbar() {
                 onChange={handleSearchChange} // מפעיל עדכון חיפוש
               />
             </form>
-
-            <>
+            {!user ? (
+              <>
+                <li className="nav-item">
+                  <a className="nav-link" href="register#">
+                    Register
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="login#">
+                    Login
+                  </a>
+                </li>
+              </>
+            ) : (
               <li className="nav-item">
-                <a className="nav-link" href="register#">
-                  Register
+                <a className="nav-link" onClick={handleLogout}>
+                  Logout
                 </a>
               </li>
-              <li className="nav-item">
-                <a className="nav-link" href="login#">
-                  Login
-                </a>
-              </li>
-            </>
+            )}
 
             <i
               className="fa-solid"

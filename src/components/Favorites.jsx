@@ -17,24 +17,27 @@ function LikedCardsPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    value.user.then((x) => setUser(x));
-    console.log("12345", user);
-
-    const fetchLikedCards = async () => {
-      setLoading(true);
+    const fetchUserAndLikedCards = async () => {
       try {
-        console.log("fdgfdgfdgdfg");
+        // טען את המשתמש אם הוא לא קיים כבר
+        if (!user) {
+          const userData = await value.user; // טען את המשתמש
+          setUser(userData);
+          console.log("User loaded:", userData);
+        }
 
-        const allCards = (await getAllCards()).data;
-        console.log("All cards:", allCards);
-        const userId = user?._id;
-        const userLikedCards = allCards.filter(
-          (card) => card.likes.includes(userId)
-          // (user?._id)
-        );
-        console.log("User liked cards:", userLikedCards);
+        // לאחר שהמשתמש נטען, טען את הכרטיסים
+        if (user) {
+          const allCards = (await getAllCards()).data;
+          console.log("All cards:", allCards);
 
-        setLikedCards(userLikedCards);
+          const userLikedCards = allCards.filter((card) =>
+            card.likes.includes(user._id)
+          );
+          console.log("User liked cards:", userLikedCards);
+
+          setLikedCards(userLikedCards);
+        }
       } catch (err) {
         console.error("Error fetching liked cards:", err);
         setError("Failed to fetch liked cards. Please try again later.");
@@ -43,9 +46,8 @@ function LikedCardsPage() {
       }
     };
 
-    if (user) fetchLikedCards();
-  }, [user]);
-
+    fetchUserAndLikedCards();
+  }, [user, value.user]);
   if (loading) {
     return (
       <div

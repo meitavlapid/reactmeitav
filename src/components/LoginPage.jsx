@@ -35,7 +35,9 @@ function LoginPage() {
         }
       } catch (error) {
         console.error("Login error:", error.message || error);
-        toast.error("Login failed. Please check your credentials.");
+        toast.error("Login failed. Please check your credentials.", {
+          toastId: "uniqueId",
+        });
 
         alert(
           error.response?.data?.message ||

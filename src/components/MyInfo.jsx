@@ -6,7 +6,7 @@ import { updateUser } from "../services/userServices";
 import { toast } from "react-toastify";
 
 function UserProfile() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const id = user?._id;
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -88,11 +88,14 @@ function UserProfile() {
 
         console.log("Data being sent to server:", userData);
         await updateUser(id, userData);
-        toast.success("Profile updated successfully!");
+        setUser(userData);
+        toast.success("Profile updated successfully!", { toastId: "uniqueId" });
         setIsEditing(false);
       } catch (error) {
         console.error("Error updating profile:", error);
-        toast.error("Failed to update profile. Please try again.");
+        toast.error("Failed to update profile. Please try again.", {
+          toastId: "uniqueId",
+        });
       }
     },
   });

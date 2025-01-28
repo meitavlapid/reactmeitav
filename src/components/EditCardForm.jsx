@@ -121,13 +121,15 @@ function EditCardForm() {
 
         console.log("Request Data:", cardData, id); // שליחת הנתונים לשרת
         await updateCard(id, cardData);
-        toast.success("Card edited successfully!");
+        toast.success("Card edited successfully!", { toastId: "uniqueId" });
         navigate("/mycards"); // ניתוב מחדש לאחר הצלחה
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
         console.log("Request Data:", cardData); // הדפס את הנתונים שנשלחו
         console.error("Error updating card:", error);
-        toast.error("Failed to edit card. Please try again later.");
+        toast.error("Failed to edit card. Please try again later.", {
+          toastId: "uniqueId",
+        });
       }
     },
   });

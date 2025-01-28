@@ -102,13 +102,13 @@ function RegisterPage() {
         // טיפול בתגובה מהשרת
         if (response.status === 200 || response.status === 201) {
           localStorage.setItem("newuser", JSON.stringify(response.data));
-          toast.success("Registration successful!");
+          toast.success("Registration successful!", { toastId: "uniqueId" });
           navigate("/home");
         } else {
           const errorMessage =
             response?.data?.message || "Registration failed. Please try again.";
           console.error("Registration failed:", response);
-          toast.error(errorMessage);
+          toast.error(errorMessage, { toastId: "uniqueId" });
         }
       } catch (error) {
         console.error("Error during registration:", error);
@@ -116,7 +116,7 @@ function RegisterPage() {
           error?.response?.data?.message ||
           error.message ||
           "A server error occurred.";
-        toast.error(errorMessage);
+        toast.error(errorMessage, { toastId: "uniqueId" });
       }
     },
   });
