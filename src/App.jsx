@@ -19,7 +19,7 @@ import LikedCardsPage from "./components/Favorites";
 import UserProfile from "./components/MyInfo";
 import About from "./components/About";
 import Footer from "./components/Footer";
-import NotFound from "./components/NotFound";
+import NotFound from "../src/components/NotFound";
 import CardDetails from "./components/CardDetails";
 import EditCardForm from "./components/EditCardForm";
 import CreateCard from "./components/CreateCard";
