@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import React from "react";
 
 function NotFound() {
-  let nav = useNavigate();
+  // let nav = useNavigate();
   return (
     <>
       <div className="container text-center">
