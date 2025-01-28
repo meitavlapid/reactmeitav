@@ -6,6 +6,7 @@ function CardDetails() {
   const { id } = useParams();
   const [card, setCard] = useState(null);
   const [err, setError] = useState(null);
+  const { VITE_GOOGLE_MAPS_API_KEY: KEY } = import.meta.env;
 
   useEffect(() => {
     const fetchCard = async () => {
