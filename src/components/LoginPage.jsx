@@ -1,13 +1,15 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
 import React from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginuser } from "../services/userServices";
 import { toast } from "react-toastify";
+import { useUser } from "../hooks/UserContext";
 
 function LoginPage() {
   // "email": "ellvis@email.com",
   //   "password": "Abc!123Abc"
+  const { fetchUser } = useUser();
 
   const navigate = useNavigate();
   const formik = useFormik({
@@ -22,14 +24,15 @@ function LoginPage() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const { email, password } = values;
-        const token = await loginuser(email, password);
+        const tokenResponse = await loginuser(email, password); // קריאה ל-API לקבלת הטוקן
 
-        if (token) {
-          console.log("Login successful:", token);
+        if (tokenResponse) {
+          console.log("Login successful:", tokenResponse);
           toast.success("Logged in successfully!", { toastId: "unique-id" });
 
-          localStorage.setItem("token", token.token); // Save token in localStorage
-          navigate("/home"); // Navigate to home page
+          // הטוקן כבר נשמר ב-localStorage בפונקציית loginuser
+          await fetchUser(); // קריאה לטעינת המשתמש ב-UserContext
+          navigate("/home"); // ניווט לדף הבית
         } else {
           alert("Login failed: Token not found.");
         }

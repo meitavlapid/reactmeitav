@@ -4,30 +4,43 @@ import { getCardId } from "../services/cardsService";
 import { useEffect, useState } from "react";
 function CardDetails() {
   const { id } = useParams();
-  const [card, setCard] = useState(null);
+  console.log("Card ID from URL:", id);
+
+  const [card, setCard] = useState();
   const [err, setError] = useState(null);
   const { VITE_GOOGLE_MAPS_API_KEY: KEY } = import.meta.env;
 
   useEffect(() => {
     const fetchCard = async () => {
       try {
+        console.log(`Fetching card with ID: ${id}`);
+
         const response = await getCardId(id);
-        console.log("Fetched card:", response);
+
+        console.log("Full API Response:", response); // הוספת הדפסה מלאה של התגובה
+
+        if (!response) {
+          throw new Error("Card not found");
+        }
+
         setCard(response);
       } catch (err) {
-        console.log("Error fetching card:", err);
+        console.error("Error fetching card:", err);
         setError("Failed to load card. Please try again later.");
       }
     };
 
     fetchCard();
   }, [id]);
+
   if (err) {
-    return <div>{err}</div>;
+    return <div className="text-danger">{err}</div>;
   }
+
   if (!card) {
     return <div>Loading...</div>;
   }
+
   return (
     <div className="container cardDetails">
       {card && (

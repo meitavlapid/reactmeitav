@@ -11,8 +11,6 @@ export async function getCardId(id) {
   try {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.log("You are not logged in. Redirecting to login page...");
-      window.location.href = "/login"; // Redirect to login page
       return;
     }
 
@@ -20,18 +18,20 @@ export async function getCardId(id) {
       `https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/${id}`,
       {
         headers: {
-          "Content-Type": "application/json",
           token,
+          "Content-Type": "application/json",
         },
       }
     );
+
+    if (!response.data) {
+      throw new Error("Card data not found");
+    }
+
     return response.data;
   } catch (error) {
-    console.error(
-      "erorr fetching card:",
-      error.response?.data || error.message
-    );
-    throw new Error(error.response?.data?.message || error.message);
+    console.error("Error fetching card:", error);
+    return null; // מחזיר null במקום undefined
   }
 }
 export async function getAllMyCards(id) {
@@ -60,42 +60,14 @@ export async function getAllMyCards(id) {
   return response;
 }
 
-//get all my cards`
-
-// export async function getAllMyCards() {
-//   try {
-//     const token = localStorage.getItem("token");
-
-//     if (!token) {
-//       throw new Error("No token found in localStorage. Redirecting to login.");
-//     }
-
-//     const response = await axios.get(
-//       "https://monkfish-app-z9uza.ondigitalocean.app/bcard2/cards/my-cards",
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           token,
-//         },
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     if (error.response?.status === 401) {
-//       console.error("Unauthorized: Redirecting to login");
-//     }
-//     throw error;
-//   }
-// }
-
 //add new card
 export async function addCard(cardData) {
   try {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("You are not logged in. Redirecting to login page...");
-      window.location.href = "/login"; // Redirect to login page
+      console.error("No token found");
+      throw new Error("Authentication token is missing");
       return;
     }
     let config = {

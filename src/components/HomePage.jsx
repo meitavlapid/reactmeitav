@@ -7,15 +7,18 @@ import { useSearch } from "../hooks/SearchContext";
 import { getUserById } from "../services/userServices";
 import { toast } from "react-toastify";
 import { useUser } from "../hooks/UserContext";
+import { use } from "react";
 
 function HomePage() {
-  const [allCards, setAllCards] = useState([]);
-  const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [likedCards, setLikedCards] = useState({});
+  const [allCards, setAllCards] = useState([]); // כל הקלפים
+  const [cards, setCards] = useState([]); // הקלפים שמוצגים
+  const [loading, setLoading] = useState(false); // מצב טעינה
+  const [error, setError] = useState(null); // מצב שגיאה
+  const [likedCards, setLikedCards] = useState({}); // הקלפים שאהובים ע"י המשתמש
+
   const { searchTerm } = useSearch(); // ערך החיפוש מה-Context
-  const { user, setUser } = useUser();
+  const { user, loading: userLoading } = useUser();
+
   const navigate = useNavigate();
 
   const handleCall = (phoneNumber) => {
@@ -23,31 +26,55 @@ function HomePage() {
   };
 
   // Fetch all cards
-  useEffect(() => {
-    const fetchCards = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllCards();
-        const fetchedCards = response.data || [];
-        setAllCards(fetchedCards);
-        setCards(fetchedCards.slice(0, 6));
-        if (user && user._id) {
-          const likesState = fetchedCards.reduce((acc, card) => {
-            acc[card._id] = card.likes.includes(user._id);
-            return acc;
-          }, {});
-          setLikedCards(likesState);
-        }
-        toast.success("Cards loaded successfully!", { toastId: "uniqueId" });
-      } catch (err) {
-        setError("Failed to load cards. Please try again later.");
-        toast.error("Error loading cards.", { toastId: "uniqueId" });
-      } finally {
-        setLoading(false);
+  const fetchCards = async () => {
+    if (userLoading) {
+      console.log("Skipping fetchCards, user not ready.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      console.log("Fetching cards...");
+      const response = await getAllCards(); // קריאה ל-API
+      const fetchedCards = response.data || [];
+      console.log("Fetched cards:", fetchedCards);
+
+      // שמירה של כל הכרטיסים
+      setAllCards(fetchedCards);
+
+      // הצגת עד 6 כרטיסים ראשוניים
+      setCards(fetchedCards.slice(0, 6));
+      if (user && user._id) {
+        // עדכון מצב הלייקים
+        const likesState = fetchedCards.reduce((acc, card) => {
+          acc[card._id] = card.likes.includes(user._id); // בדוק אם המשתמש אהב את הכרטיס
+          return acc;
+        }, {});
+        setLikedCards(likesState);
+        console.log("Likes state updated:", likesState);
+      } else {
+        // אם אין משתמש מחובר, נאתחל את מצב הלייקים לכל `false`
+        setLikedCards({});
       }
-    };
-    fetchCards();
-  }, [user]);
+    } catch (err) {
+      console.error("Error fetching cards:", err);
+      setError("Failed to load cards.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    console.log("User loading:", userLoading);
+    console.log("Current user:", user);
+
+    if (userLoading === true) {
+      console.log("Skipping fetchCards, user not ready.");
+      return;
+    }
+
+    fetchCards(); // קריאה לטעינת הכרטיסים
+  }, [user, userLoading]);
 
   // Filter cards based on searchTerm
   useEffect(() => {
@@ -87,6 +114,11 @@ function HomePage() {
       toast.error("Failed to update like status.", { toastId: "uniqueId" });
     }
   };
+
+  // בזמן שהמשתמש עדיין בטעינה, הצג הודעה מתאימה
+  if (userLoading) {
+    return <div>Loading user data...</div>;
+  }
   return (
     <div className="home-container ">
       <header className="text-center py-4">
@@ -138,7 +170,13 @@ function HomePage() {
 
                 <button
                   className="view-button"
-                  onClick={() => navigate(`/createcard/${card._id}`)}
+                  onClick={() => {
+                    if (!user) {
+                      navigate("/login");
+                    } else {
+                      navigate(`/card/${card._id}`);
+                    }
+                  }}
                 >
                   View
                 </button>

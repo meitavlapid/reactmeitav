@@ -70,7 +70,7 @@ export async function getUserById(id) {
         },
       }
     );
-    console.log("API Response:", response); // Debugging: Log the full response
+    console.log("API Response:", response.data); // Debugging: Log the full response
     return await response.data; // מחזיר את הטוקן בתוך אובייקט
   } catch (error) {
     console.error(

@@ -9,7 +9,7 @@ import {
 import { ThemeProvider } from "./components/themeContext";
 import { SearchProvider } from "./hooks/SearchContext";
 import { UserProvider } from "./hooks/UserContext";
-
+import { useUser } from "./hooks/UserContext";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
@@ -28,7 +28,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 const AppContent = ({ user, toggleTheme, handleSearch, allCards }) => {
-  const location = useLocation(); // שימוש בתוך רכיב פנימי בתוך Router
+  const location = useLocation();
   const hideNavbarRoutes = ["/login", "/register"];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
@@ -41,9 +41,8 @@ const AppContent = ({ user, toggleTheme, handleSearch, allCards }) => {
           onSearch={handleSearch}
         />
       )}
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={1500} />
       <Routes>
-        {/* הפנייה ברירת מחדל */}
         <Route path="/" element={<Navigate to="/home" />} />
 
         <Route
@@ -53,7 +52,7 @@ const AppContent = ({ user, toggleTheme, handleSearch, allCards }) => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/createcard/:id" element={<CardDetails />} />
+        <Route path="/carddetails/:id" element={<CardDetails />} />
         <Route path="/createcard" element={<CreateCard />} />
         <Route path="/mycards" element={<MyCardsPage />} />
         <Route path="/favorites" element={<LikedCardsPage />} />
